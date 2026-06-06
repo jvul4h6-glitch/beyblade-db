@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="陀螺零件庫">
+<meta name="theme-color" content="#1a1a2e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">
+<title>陀螺零件庫</title>
+<style>
+:root {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --card2: #16213e;
+  --accent: #e94560;
+  --accent2: #0f3460;
+  --text: #eee;
+  --text2: #aaa;
+  --border: #2a2a4a;
+  --success: #4ecca3;
+  --warning: #f0a500;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
+
+/* Header */
+.header { background: var(--card); padding: 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+.header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.header h1 span { font-size: 24px; }
+
+/* Search */
+.search-box { margin-top: 12px; position: relative; }
+.search-box input { width: 100%; padding: 12px 16px 12px 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; outline: none; }
+.search-box input:focus { border-color: var(--accent); }
+.search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; }
+
+/* Category Filter */
+.filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Stats */
+.stats { display: flex; gap: 12px; margin-top: 12px; }
+.stat { flex: 1; background: var(--card2); border-radius: 10px; padding: 10px; text-align: center; }
+.stat .num { font-size: 22px; font-weight: 700; color: var(--accent); }
+.stat .label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* Grid */
+.grid { padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+/* Card */
+.card { background: var(--card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.15s; cursor: pointer; }
+.card:active { transform: scale(0.97); }
+.card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card-body { padding: 10px; }
+.card-name { font-size: 14px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-cat { font-size: 11px; color: var(--accent); margin-top: 4px; }
+.card-note { font-size: 11px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* FAB */
+.fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(233,69,96,0.4); cursor: pointer; z-index: 200; border: none; transition: transform 0.15s; }
+.fab:active { transform: scale(0.9); }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; align-items: flex-end; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 24px; animation: slideUp 0.25s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h2 { font-size: 18px; }
+.modal-close { font-size: 24px; cursor: pointer; color: var(--text2); padding: 4px; }
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; outline: none; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+/* Photo */
+.photo-area { border: 2px dashed var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.photo-area:hover { border-color: var(--accent); }
+.photo-area .icon { font-size: 40px; margin-bottom: 8px; }
+.photo-area .hint { font-size: 13px; color: var(--text2); }
+.photo-area input { display: none; }
+.photo-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; margin-top: 10px; display: none; }
+
+/* Buttons */
+.btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn:active { opacity: 0.8; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-danger { background: #dc3545; color: #fff; }
+.btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-row { display: flex; gap: 10px; margin-top: 20px; }
+.btn-row .btn { flex: 1; }
+
+/* Detail Modal */
+.detail-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 12px; background: var(--card2); margin-bottom: 16px; }
+.detail-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.detail-cat { display: inline-block; padding: 4px 12px; border-radius: 12px; background: var(--accent); color: #fff; font-size: 13px; margin-bottom: 12px; }
+.detail-note { font-size: 14px; color: var(--text2); line-height: 1.6; white-space: pre-wrap; }
+.detail-date { font-size: 12px; color: var(--text2); margin-top: 16px; opacity: 0.6; }
+
+/* Empty State */
+.empty { text-align: center; padding: 60px 20px; }
+.empty .icon { font-size: 64px; margin-bottom: 16px; }
+.empty p { color: var(--text2); font-size: 14px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); color: var(--text); padding: 12px 24px; border-radius: 12px; font-size: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 400; transition: transform 0.3s ease; border: 1px solid var(--border); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Install Banner */
+.install-banner { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card2); padding: 12px 16px; border-top: 1px solid var(--border); z-index: 150; align-items: center; gap: 12px; font-size: 13px; }
+.install-banner.show { display: flex; }
+.install-banner button { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.install-banner .close-banner { background: none; color: var(--text2); font-size: 18px; padding: 4px 8px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1><span>🌀</span> 陀螺零件庫</h1>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="搜尋零件名稱...">
+  </div>
+  <div class="filters" id="filters">
+    <div class="filter-btn active" data-cat="all">全部</div>
+    <div class="filter-btn" data-cat="blade">刃 (Blade)</div>
+    <div class="filter-btn" data-cat="lock">固鎖 (Lock)</div>
+    <div class="filter-btn" data-cat="driver">軸心 (Driver)</div>
+    <div class="filter-btn" data-cat="other">其他</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num" id="totalCount">0</div><div class="label">總零件</div></div>
+    <div class="stat"><div class="num" id="bladeCount">0</div><div class="label">刃</div></div>
+    <div class="stat"><div class="num" id="lockCount">0</div><div class="label">固鎖</div></div>
+    <div class="stat"><div class="num" id="driverCount">0</div><div class="label">軸心</div></div>
+  </div>
+</div>
+
+<!-- Grid -->
+<div class="grid" id="grid"></div>
+
+<!-- Empty State -->
+<div class="empty" id="empty" style="display:none;">
+  <div class="icon">📦</div>
+  <p>還沒有零件<br>點右下角 + 開始新增</p>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn">+</button>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">新增零件</h2>
+      <span class="modal-close" id="modalClose">✕</span>
+    </div>
+    <form id="partForm">
+      <input type="hidden" id="editId">
+      <div class="form-group">
+        <label>📷 照片</label>
+        <div class="photo-area" id="photoArea">
+          <div class="icon">📸</div>
+          <div class="hint">點擊拍照或從相簿選擇</div>
+          <input type="file" id="photoInput" accept="image/*" capture="environment">
+          <img class="photo-preview" id="photoPreview">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>🏷️ 零件名稱 *</label>
+        <input type="text" id="partName" placeholder="例如：CX-04 英仙幽冥" required>
+      </div>
+      <div class="form-group">
+        <label>📂 分類</label>
+        <select id="partCat">
+          <option value="blade">刃 (Blade)</option>
+          <option value="lock">固鎖 (Lock)</option>
+          <option value="driver">軸心 (Driver)</option>
+          <option value="other">其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>📝 備註</label>
+        <textarea id="partNote" placeholder="數量、狀態、購買來源等..."></textarea>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" id="cancelBtn">取消</button>
+        <button type="submit" class="btn btn-primary" id="saveBtn">儲存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>零件詳情</h2>
+      <span class="modal-close" id="detailClose">✕</span>
+    </div>
+    <div id="detailContent"></div>
+    <div class="btn-row">
+      <button class="btn btn-danger" id="deleteBtn">🗑 刪除</button>
+      <button class="btn btn-primary" id="editBtn">✏️ 編輯</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Install Banner -->
+<div class="install-banner" id="installBanner">
+  <span style="flex:1">📲 加入主畫面，像 App 一樣使用</span>
+  <button id="installBtn">加入</button>
+  <button class="close-banner" id="closeBanner">✕</button>
+</div>
+
+<script>
+// ===== IndexedDB =====
+const DB_NAME = 'BeybladePartsDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'parts';
+let db;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('cat', 'cat', { unique: false });
+        store.createIndex('name', 'name', { unique: false });
+        store.createIndex('created', 'created', { unique: false });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+function getAllParts() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function addPart(part) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    part.created = Date.now();
+    const req = store.add(part);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function updatePart(part) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.put(part);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function deletePart(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const req = store.delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ===== State =====
+let allParts = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let detailId = null;
+let deferredPrompt = null;
+
+// ===== DOM =====
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const searchInput = document.getElementById('searchInput');
+const filters = document.getElementById('filters');
+const fabBtn = document.getElementById('fabBtn');
+const formModal = document.getElementById('formModal');
+const detailModal = document.getElementById('detailModal');
+const modalClose = document.getElementById('modalClose');
+const detailClose = document.getElementById('detailClose');
+const partForm = document.getElementById('partForm');
+const cancelBtn = document.getElementById('cancelBtn');
+const photoArea = document.getElementById('photoArea');
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
+const detailContent = document.getElementById('detailContent');
+const deleteBtn = document.getElementById('deleteBtn');
+const editBtn = document.getElementById('editBtn');
+const toast = document.getElementById('toast');
+const installBanner = document.getElementById('installBanner');
+const installBtn = document.getElementById('installBtn');
+const closeBanner = document.getElementById('closeBanner');
+
+// ===== Render =====
+function render() {
+  let parts = allParts;
+
+  // Filter by category
+  if (currentFilter !== 'all') {
+    parts = parts.filter(p => p.cat === currentFilter);
+  }
+
+  // Filter by search
+  if (currentSearch) {
+    const q = currentSearch.toLowerCase();
+    parts = parts.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.note || '').toLowerCase().includes(q)
+    );
+  }
+
+  // Sort by created desc
+  parts.sort((a, b) => (b.created || 0) - (a.created || 0));
+
+  // Stats
+  document.getElementById('totalCount').textContent = allParts.length;
+  document.getElementById('bladeCount').textContent = allParts.filter(p => p.cat === 'blade').length;
+  document.getElementById('lockCount').textContent = allParts.filter(p => p.cat === 'lock').length;
+  document.getElementById('driverCount').textContent = allParts.filter(p => p.cat === 'driver').length;
+
+  if (parts.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  grid.innerHTML = parts.map(p => {
+    const imgHtml = p.photo
+      ? `<img src="${p.photo}" alt="${escHtml(p.name)}" loading="lazy">`
+      : `<span>${getCatEmoji(p.cat)}</span>`;
+    return `
+      <div class="card" data-id="${p.id}">
+        <div class="card-img">${imgHtml}</div>
+        <div class="card-body">
+          <div class="card-name">${escHtml(p.name)}</div>
+          <div class="card-cat">${getCatLabel(p.cat)}</div>
+          ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Card click
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => showDetail(parseInt(card.dataset.id)));
+  });
+}
+
+function getCatEmoji(cat) {
+  const map = { blade: '⚔️', lock: '🔒', driver: '⚙️', other: '📦' };
+  return map[cat] || '📦';
+}
+
+function getCatLabel(cat) {
+  const map = { blade: '刃 (Blade)', lock: '固鎖 (Lock)', driver: '軸心 (Driver)', other: '其他' };
+  return map[cat] || '其他';
+}
+
+function escHtml(s) {
+  const d = document.createElement('d');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== Search =====
+searchInput.addEventListener('input', e => {
+  currentSearch = e.target.value.trim();
+  render();
+});
+
+// ===== Filters =====
+filters.addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentFilter = e.target.dataset.cat;
+  render();
+});
+
+// ===== FAB =====
+fabBtn.addEventListener('click', () => {
+  document.getElementById('modalTitle').textContent = '新增零件';
+  document.getElementById('editId').value = '';
+  partForm.reset();
+  photoPreview.style.display = 'none';
+  photoPreview.src = '';
+  formModal.classList.add('show');
+});
+
+// ===== Modal Close =====
+modalClose.addEventListener('click', () => formModal.classList.remove('show'));
+cancelBtn.addEventListener('click', () => formModal.classList.remove('show'));
+formModal.addEventListener('click', e => { if (e.target === formModal) formModal.classList.remove('show'); });
+
+detailClose.addEventListener('click', () => detailModal.classList.remove('show'));
+detailModal.addEventListener('click', e => { if (e.target === detailModal) detailModal.classList.remove('show'); });
+
+// ===== Photo =====
+photoArea.addEventListener('click', () => photoInput.click());
+photoInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  // Compress image
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 600;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      photoPreview.src = dataUrl;
+      photoPreview.style.display = 'block';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ===== Save =====
+partForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const editId = document.getElementById('editId').value;
+  const name = document.getElementById('partName').value.trim();
+  const cat = document.getElementById('partCat').value;
+  const note = document.getElementById('partNote').value.trim();
+  const photo = photoPreview.style.display !== 'none' ? photoPreview.src : null;
+
+  if (!name) { showToast('請輸入零件名稱'); return; }
+
+  try {
+    if (editId) {
+      const parts = await getAllParts();
+      const part = parts.find(p => p.id === parseInt(editId));
+      if (part) {
+        part.name = name;
+        part.cat = cat;
+        part.note = note;
+        if (photo) part.photo = photo;
+        await updatePart(part);
+        showToast('✅ 已更新');
+      }
+    } else {
+      await addPart({ name, cat, note, photo });
+      showToast('✅ 已新增');
+    }
+    formModal.classList.remove('show');
+    allParts = await getAllParts();
+    render();
+  } catch (err) {
+    showToast('❌ 儲存失敗：' + err.message);
+  }
+});
+
+// ===== Detail =====
+async function showDetail(id) {
+  const parts = await getAllParts();
+  const part = parts.find(p => p.id === id);
+  if (!part) return;
+  detailId = id;
+
+  const imgHtml = part.photo
+    ? `<img class="detail-img" src="${part.photo}" alt="${escHtml(part.name)}">`
+    : `<div class="detail-img" style="display:flex;align-items:center;justify-content:center;font-size:80px;background:var(--card2);">${getCatEmoji(part.cat)}</div>`;
+
+  detailContent.innerHTML = `
+    ${imgHtml}
+    <div class="detail-name">${escHtml(part.name)}</div>
+    <span class="detail-cat">${getCatLabel(part.cat)}</span>
+    ${part.note ? `<div class="detail-note">${escHtml(part.note)}</div>` : ''}
+    <div class="detail-date">📅 ${new Date(part.created).toLocaleString('zh-TW')}</div>
+  `;
+  detailModal.classList.add('show');
+}
+
+// ===== Delete =====
+deleteBtn.addEventListener('click', async () => {
+  if (!detailId) return;
+  if (!confirm('確定要刪除這個零件嗎？')) return;
+  try {
+    await deletePart(detailId);
+    detailModal.classList.remove('show');
+    allParts = await getAllParts();
+    render();
+    showToast('🗑 已刪除');
+  } catch (err) {
+    showToast('❌ 刪除失敗');
+  }
+});
+
+// ===== Edit =====
+editBtn.addEventListener('click', async () => {
+  if (!detailId) return;
+  const parts = await getAllParts();
+  const part = parts.find(p => p.id === detailId);
+  if (!part) return;
+
+  detailModal.classList.remove('show');
+  document.getElementById('modalTitle').textContent = '編輯零件';
+  document.getElementById('editId').value = part.id;
+  document.getElementById('partName').value = part.name;
+  document.getElementById('partCat').value = part.cat;
+  document.getElementById('partNote').value = part.note || '';
+
+  if (part.photo) {
+    photoPreview.src = part.photo;
+    photoPreview.style.display = 'block';
+  } else {
+    photoPreview.style.display = 'none';
+    photoPreview.src = '';
+  }
+
+  formModal.classList.add('show');
+});
+
+// ===== Toast =====
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ===== PWA Install =====
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Only show if not standalone
+  if (!window.matchMedia('(display-mode: standalone)').matches) {
+    installBanner.classList.add('show');
+  }
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    // iOS Safari doesn't support beforeinstallprompt
+    showToast('📲 用 Safari 開啟 → 分享 → 加入主畫面');
+    return;
+  }
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') installBanner.classList.remove('show');
+  deferredPrompt = null;
+});
+
+closeBanner.addEventListener('click', () => installBanner.classList.remove('show'));
+
+// iOS Safari hint
+if (window.navigator.standalone !== true && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+  setTimeout(() => {
+    showToast('📲 Safari 分享 → 加入主畫面');
+  }, 3000);
+}
+
+// ===== Service Worker =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ===== Init =====
+(async () => {
+  await openDB();
+  allParts = await getAllParts();
+  render();
+})();
+</script>
+</body>
+</html>
