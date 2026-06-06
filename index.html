@@ -591,10 +591,9 @@ if (window.navigator.standalone !== true && /iPhone|iPad|iPod/.test(navigator.us
   }, 3000);
 }
 
-// ===== Service Worker =====
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+// ===== No Service Worker =====
+// SW removed to avoid iOS standalone mode routing issues
+// Data is stored in IndexedDB which works fine offline
 
 // ===== Init =====
 (async () => {
