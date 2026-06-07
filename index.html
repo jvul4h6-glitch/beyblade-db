@@ -22,39 +22,41 @@
   --border: #2a2a4a;
   --success: #4ecca3;
   --warning: #f0a500;
+  --compare-btn-bg: #e94560;
+  --compare-btn-text: #fff;
+  --atk: #e94560;
+  --def: #4ecca3;
+  --sta: #5dade2;
+  --dash: #f0a500;
+  --burst: #af7ac5;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
 
 /* Header */
-.header { background: var(--card); padding: 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); overflow: visible; }
-.header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.header { background: var(--card); padding: 16px 16px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); overflow: visible; }
+.header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .header h1 span { font-size: 24px; }
 
+/* Tabs */
+.tabs { display: flex; gap: 0; margin: 0 -16px; border-top: 1px solid var(--border); }
+.tab-btn { flex: 1; padding: 12px 16px; border: none; background: none; color: var(--text2); font-size: 15px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:active { opacity: 0.7; }
+
 /* Search Box */
-.search-box { position: relative; margin-top: 12px; z-index: 10; display: flex; gap: 8px; align-items: center; }
+.search-box { position: relative; margin-top: 12px; z-index: 10; display: flex; gap: 8px; align-items: center; padding-bottom: 8px; }
 .search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; z-index: 1; pointer-events: none; }
 #searchInput { width: 100%; padding: 12px 16px 12px 40px; border-radius: 12px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; outline: none; box-sizing: border-box; display: block; flex: 1; }
 #searchInput:focus { border-color: var(--accent); }
-#searchBtn { padding: 12px 20px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-#searchBtn:active { opacity: 0.8; }
 
-/* Part DB Search */
-.db-search { padding: 16px; }
-.db-search-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 16px; outline: none; margin-bottom: 12px; }
-.db-search-input:focus { border-color: var(--accent); }
-.db-cat-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.db-cat-tab { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; cursor: pointer; }
-.db-cat-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.db-results { display: flex; flex-direction: column; gap: 8px; }
-.db-item { background: var(--card); border-radius: 10px; padding: 12px; border: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-.db-item:active { background: var(--card2); }
-.db-item-name { font-size: 14px; font-weight: 600; }
-.db-item-code { font-size: 12px; color: var(--text2); }
-.db-item-cat { font-size: 11px; color: var(--accent); }
-.db-item-add { padding: 6px 12px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; border: none; cursor: pointer; }
-.db-empty { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
-.search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; }
+/* Filter bar */
+.filter-bar { padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.row-filters { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Category Radio Buttons */
 .cat-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -63,13 +65,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .cat-radio-span { display: inline-block; padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; transition: all 0.2s; }
 .cat-radio-input:checked + .cat-radio-span { background: var(--accent); color: #fff; border-color: var(--accent); }
 .cat-radio-label:active .cat-radio-span { opacity: 0.7; }
-.filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.filters::-webkit-scrollbar { display: none; }
-.filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
-.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Sort select */
+.sort-select { padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
 
 /* Stats */
-.stats { display: flex; gap: 12px; margin-top: 12px; }
+.stats { display: flex; gap: 12px; padding: 0 16px 8px; }
 .stat { flex: 1; background: var(--card2); border-radius: 10px; padding: 10px; text-align: center; }
 .stat .num { font-size: 22px; font-weight: 700; color: var(--accent); }
 .stat .label { font-size: 11px; color: var(--text2); margin-top: 2px; }
@@ -78,18 +79,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .grid { padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
 /* Card */
-.card { background: var(--card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.15s; cursor: pointer; }
+.card { background: var(--card); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.15s, border-color 0.2s; cursor: pointer; position: relative; }
 .card:active { transform: scale(0.97); }
+.card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.card.selected::after { content: '✓'; position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 .card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 48px; }
 .card-img img { width: 100%; height: 100%; object-fit: cover; }
 .card-body { padding: 10px; }
 .card-name { font-size: 14px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-name-sub { font-size: 11px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-cat { font-size: 11px; color: var(--accent); margin-top: 4px; }
 .card-note { font-size: 11px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-series { font-size: 10px; color: var(--text2); background: var(--card2); padding: 2px 6px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+
+/* Stat bars */
+.stat-bars { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.stat-bar-row { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+.stat-bar-label { width: 26px; color: var(--text2); font-size: 9px; }
+.stat-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.stat-bar-val { width: 22px; text-align: right; font-size: 10px; color: var(--text2); }
+.atk-bar { background: var(--atk); }
+.def-bar { background: var(--def); }
+.sta-bar { background: var(--sta); }
+.dash-bar { background: var(--dash); }
+.burst-bar { background: var(--burst); }
+
+/* Owned checkbox */
+.owned-check { display: flex; align-items: center; gap: 6px; padding: 6px 10px; font-size: 12px; color: var(--success); cursor: pointer; }
+.owned-check input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; }
 
 /* FAB */
 .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(233,69,96,0.4); cursor: pointer; z-index: 200; border: none; transition: transform 0.15s; }
 .fab:active { transform: scale(0.9); }
+
+/* Compare floating bar */
+.compare-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; z-index: 250; box-shadow: 0 4px 20px rgba(0,0,0,0.4); transition: transform 0.3s ease; font-size: 14px; white-space: nowrap; }
+.compare-bar.show { transform: translateX(-50%) translateY(0); }
+.compare-bar .compare-count { color: var(--accent); font-weight: 700; }
+.compare-bar .compare-btn-go { padding: 8px 18px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.compare-bar .compare-btn-clear { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; cursor: pointer; }
 
 /* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; align-items: flex-end; justify-content: center; }
@@ -126,10 +155,40 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* Detail Modal */
 .detail-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 12px; background: var(--card2); margin-bottom: 16px; }
-.detail-name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-.detail-cat { display: inline-block; padding: 4px 12px; border-radius: 12px; background: var(--accent); color: #fff; font-size: 13px; margin-bottom: 12px; }
+.detail-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.detail-name-en { font-size: 14px; color: var(--text2); margin-bottom: 8px; }
+.detail-cat { display: inline-block; padding: 4px 12px; border-radius: 12px; background: var(--accent); color: #fff; font-size: 13px; margin-bottom: 4px; }
+.detail-series { display: inline-block; padding: 4px 12px; border-radius: 12px; background: var(--accent2); color: #fff; font-size: 13px; margin-bottom: 12px; }
 .detail-note { font-size: 14px; color: var(--text2); line-height: 1.6; white-space: pre-wrap; }
 .detail-date { font-size: 12px; color: var(--text2); margin-top: 16px; opacity: 0.6; }
+
+/* Radar chart */
+.radar-container { display: flex; justify-content: center; margin: 16px 0; }
+.radar-container canvas { max-width: 280px; max-height: 280px; }
+
+/* Detail stat table */
+.detail-stats { width: 100%; margin: 12px 0; }
+.detail-stats .stat-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.detail-stats .stat-row:last-child { border-bottom: none; }
+.detail-stats .stat-name { width: 52px; font-size: 13px; color: var(--text2); }
+.detail-stats .stat-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.detail-stats .stat-fill { height: 100%; border-radius: 4px; }
+.detail-stats .stat-num { width: 32px; text-align: right; font-size: 14px; font-weight: 600; }
+
+/* Compare modal */
+.compare-table { width: 100%; margin: 12px 0; overflow-x: auto; }
+.compare-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th { padding: 8px 6px; text-align: center; color: var(--text2); font-weight: 600; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.compare-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+.compare-table td:first-child { text-align: left; font-weight: 600; color: var(--text); }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+
+/* Radar compare */
+.compare-radars { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 12px 0; }
+.compare-radar-item { text-align: center; }
+.compare-radar-item .radar-title { font-size: 12px; color: var(--text2); margin-bottom: 4px; font-weight: 600; }
+.compare-radar-item canvas { width: 160px; height: 160px; }
 
 /* Empty State */
 .empty { text-align: center; padding: 60px 20px; }
@@ -150,9 +209,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .logo { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 6px; }
 
 /* Backup Bar */
-.backup-bar { display: flex; gap: 8px; padding: 8px 16px 0; justify-content: flex-end; }
+.backup-bar { display: flex; gap: 8px; padding: 8px 0 0; justify-content: flex-end; }
 .backup-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.2s; }
 .backup-btn:active { opacity: 0.6; }
+
+/* Tab content */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Section title */
+.section-title { font-size: 15px; font-weight: 700; padding: 12px 16px 4px; color: var(--text2); }
+
+/* Owned filter row */
+.owned-filter-row { display: flex; gap: 8px; padding: 8px 16px; }
+.owned-filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.owned-filter-btn.active { background: var(--success); color: #fff; border-color: var(--success); }
+
+/* Responsive */
+@media (min-width: 600px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 900px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -160,41 +239,102 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <!-- Header -->
 <div class="header">
   <h1><img class="logo" src="./logo.jpg" alt="logo"> 陀螺零件庫</h1>
-  <div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="搜尋零件名稱、代號、備註...">
-    <button id="searchBtn">搜尋</button>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="encyclopedia">📖 圖鑑</button>
+    <button class="tab-btn" data-tab="warehouse">📦 我的倉庫</button>
   </div>
-  <div class="filters" id="filters">
+</div>
+
+<!-- Tab: Encyclopedia (圖鑑) -->
+<div class="tab-content active" id="tab-encyclopedia">
+  <!-- Filters row 1: series -->
+  <div class="filter-bar" id="encSeriesFilters">
+    <div class="filter-btn active" data-series="all">全部</div>
+    <div class="filter-btn" data-series="BX">BX</div>
+    <div class="filter-btn" data-series="UX">UX</div>
+    <div class="filter-btn" data-series="CX">CX</div>
+    <div class="filter-btn" data-series="其他">其他</div>
+  </div>
+  <!-- Filters row 2: type + search + sort -->
+  <div class="filter-bar" id="encTypeFilters">
+    <div class="filter-btn active" data-type="all">全部類型</div>
+    <div class="filter-btn" data-type="blade">刃 (Blade)</div>
+    <div class="filter-btn" data-type="ratchet">固鎖 (Ratchet)</div>
+    <div class="filter-btn" data-type="bit">軸心 (Bit)</div>
+    <div style="flex:1"></div>
+    <select class="sort-select" id="encSort">
+      <option value="default">預設排序</option>
+      <option value="attack">⚔️ 攻擊</option>
+      <option value="defense">🛡️ 防禦</option>
+      <option value="stamina">💨 持久</option>
+      <option value="dash">⚡ 加速</option>
+      <option value="burst">💥 耐久</option>
+      <option value="name">🔤 名稱</option>
+    </select>
+  </div>
+  <!-- Search -->
+  <div class="search-box" style="margin:0;padding:0 16px 8px;">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="encSearchInput" placeholder="搜尋名稱或代號...">
+  </div>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="num" id="encTotalCount">0</div><div class="label">顯示中</div></div>
+    <div class="stat"><div class="num" id="encSelectedCount">0</div><div class="label">已選比較</div></div>
+  </div>
+  <div id="compareBar" class="compare-bar">
+    <span>已選 <span class="compare-count" id="compareCountText">0</span> 個零件</span>
+    <button class="compare-btn-clear" id="compareClearBtn">清除</button>
+    <button class="compare-btn-go" id="compareGoBtn">🔍 比較</button>
+  </div>
+  <!-- Grid -->
+  <div class="grid" id="encGrid"></div>
+</div>
+
+<!-- Tab: Warehouse (我的倉庫) -->
+<div class="tab-content" id="tab-warehouse">
+  <div class="search-box" style="margin:0;padding:12px 16px 8px;">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="whSearchInput" placeholder="搜尋零件名稱、代號、備註...">
+  </div>
+  <!-- Warehouse filters -->
+  <div class="filter-bar" id="whCatFilters">
     <div class="filter-btn active" data-cat="all">全部</div>
     <div class="filter-btn" data-cat="blade">刃 (Blade)</div>
     <div class="filter-btn" data-cat="lock">固鎖 (Lock)</div>
     <div class="filter-btn" data-cat="driver">軸心 (Driver)</div>
     <div class="filter-btn" data-cat="other">其他</div>
   </div>
-  <!-- Sub-filters for lock/driver (populated dynamically when category selected) -->
-  <div class="filters" id="subFilters" style="margin-top:8px;display:none;">
+  <!-- Sub-filters -->
+  <div class="filter-bar" id="whSubFilters" style="display:none;"></div>
+  <!-- Owned filter -->
+  <div class="owned-filter-row">
+    <div class="owned-filter-btn active" data-owned="all">全部</div>
+    <div class="owned-filter-btn" data-owned="yes">☑️ 已擁有</div>
+    <div class="owned-filter-btn" data-owned="no">☐ 未擁有</div>
   </div>
+  <!-- Stats -->
   <div class="stats">
-    <div class="stat"><div class="num" id="totalCount">0</div><div class="label">總零件</div></div>
-    <div class="stat"><div class="num" id="bladeCount">0</div><div class="label">刃</div></div>
-    <div class="stat"><div class="num" id="lockCount">0</div><div class="label">固鎖</div></div>
-    <div class="stat"><div class="num" id="driverCount">0</div><div class="label">軸心</div></div>
+    <div class="stat"><div class="num" id="whTotalCount">0</div><div class="label">總零件</div></div>
+    <div class="stat"><div class="num" id="whOwnedCount">0</div><div class="label">已擁有</div></div>
+    <div class="stat"><div class="num" id="whBladeCount">0</div><div class="label">刃</div></div>
+    <div class="stat"><div class="num" id="whLockCount">0</div><div class="label">固鎖</div></div>
+    <div class="stat"><div class="num" id="whDriverCount">0</div><div class="label">軸心</div></div>
   </div>
+  <!-- Backup -->
   <div class="backup-bar">
     <button class="backup-btn" id="backupBtn" title="備份資料">📥 備份</button>
     <button class="backup-btn" id="restoreBtn" title="匯入資料">📤 匯入</button>
     <input type="file" id="restoreInput" accept=".json" style="display:none">
   </div>
-</div>
-
-<!-- Grid -->
-<div class="grid" id="grid"></div>
-
-<!-- Empty State -->
-<div class="empty" id="empty" style="display:none;">
-  <div class="icon">📦</div>
-  <p>還沒有零件<br>點右下角 + 開始新增</p>
+  <!-- Grid -->
+  <div class="grid" id="whGrid"></div>
+  <!-- Empty State -->
+  <div class="empty" id="whEmpty" style="display:none;">
+    <div class="icon">📦</div>
+    <p>還沒有零件<br>點右下角 + 開始新增</p>
+  </div>
 </div>
 
 <!-- FAB -->
@@ -265,7 +405,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div>
 </div>
 
-<!-- Detail Modal -->
+<!-- Detail Modal (warehouse) -->
 <div class="modal-overlay" id="detailModal">
   <div class="modal">
     <div class="modal-header">
@@ -277,6 +417,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <button class="btn btn-danger" id="deleteBtn">🗑 刪除</button>
       <button class="btn btn-primary" id="editBtn">✏️ 編輯</button>
     </div>
+  </div>
+</div>
+
+<!-- Encyclopedia Detail Modal -->
+<div class="modal-overlay" id="encDetailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>零件詳情</h2>
+      <span class="modal-close" id="encDetailClose">✕</span>
+    </div>
+    <div id="encDetailContent"></div>
+  </div>
+</div>
+
+<!-- Compare Modal -->
+<div class="modal-overlay" id="compareModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>⚔️ 零件比較</h2>
+      <span class="modal-close" id="compareClose">✕</span>
+    </div>
+    <div id="compareContent"></div>
   </div>
 </div>
 
@@ -293,7 +455,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script>
 // ===== IndexedDB =====
 const DB_NAME = 'BeybladePartsDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'parts';
 let db;
 
@@ -307,6 +469,7 @@ function openDB() {
         store.createIndex('cat', 'cat', { unique: false });
         store.createIndex('name', 'name', { unique: false });
         store.createIndex('created', 'created', { unique: false });
+        store.createIndex('owned', 'owned', { unique: false });
       }
     };
     req.onsuccess = e => { db = e.target.result; resolve(db); };
@@ -329,6 +492,7 @@ function addPart(part) {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     part.created = Date.now();
+    if (part.owned === undefined) part.owned = true;
     const req = store.add(part);
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -355,54 +519,521 @@ function deletePart(id) {
   });
 }
 
+// ===== DOM helpers =====
+function escHtml(s) {
+  if (s == null) return '';
+  const d = document.createElement('d');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function getCatEmoji(cat) {
+  const map = { blade: '⚔️', lock: '🔒', driver: '⚙️', other: '📦', ratchet: '🔒', bit: '⚙️' };
+  return map[cat] || '📦';
+}
+
+function getCatLabel(cat) {
+  const map = { blade: '刃 (Blade)', lock: '固鎖 (Lock)', driver: '軸心 (Driver)', other: '其他', ratchet: '固鎖 (Ratchet)', bit: '軸心 (Bit)' };
+  return map[cat] || '其他';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
 // ===== State =====
 let allParts = [];
-let currentFilter = 'all';
-let currentSubFilter = ''; // e.g. '3-80' for lock, 'J' for driver
-let currentSearch = '';
+let partsDB = null;
+let currentTab = 'encyclopedia';
+
+// Encyclopedia state
+let encSeriesFilter = 'all';
+let encTypeFilter = 'all';
+let encSearch = '';
+let encSortBy = 'default';
+let encSelectedIds = new Set();
+
+// Warehouse state
+let whCatFilter = 'all';
+let whSubFilter = '';
+let whSearch = '';
+let whOwnedFilter = 'all';
 let detailId = null;
 let deferredPrompt = null;
 
-// ===== DOM =====
-const grid = document.getElementById('grid');
-const empty = document.getElementById('empty');
-const searchInput = document.getElementById('searchInput');
-const filters = document.getElementById('filters');
-const fabBtn = document.getElementById('fabBtn');
-const formModal = document.getElementById('formModal');
-const detailModal = document.getElementById('detailModal');
-const modalClose = document.getElementById('modalClose');
-const detailClose = document.getElementById('detailClose');
-const partForm = document.getElementById('partForm');
-const cancelBtn = document.getElementById('cancelBtn');
-const photoArea = document.getElementById('photoArea');
-const photoInput = document.getElementById('photoInput');
-const photoPreview = document.getElementById('photoPreview');
-const detailContent = document.getElementById('detailContent');
-const deleteBtn = document.getElementById('deleteBtn');
-const editBtn = document.getElementById('editBtn');
-const toast = document.getElementById('toast');
-const installBanner = document.getElementById('installBanner');
-const installBtn = document.getElementById('installBtn');
-const closeBanner = document.getElementById('closeBanner');
+// ===== Load PartsDB =====
+async function loadPartsDB() {
+  if (partsDB) return partsDB;
+  try {
+    const resp = await fetch('parts-db.json');
+    partsDB = await resp.json();
+    return partsDB;
+  } catch(e) {
+    console.error('Failed to load parts DB:', e);
+    // Fallback to parts.json
+    try {
+      const resp = await fetch('parts.json');
+      partsDB = await resp.json();
+      return partsDB;
+    } catch(e2) {
+      console.error('Failed to load fallback parts DB:', e2);
+      return { blade: [], ratchet: [], bit: [] };
+    }
+  }
+}
 
-// ===== Render =====
-function render() {
+// Flatten partsDB into a single array with type info
+function flatPartsDB() {
+  if (!partsDB) return [];
+  const result = [];
+  if (partsDB.blade) for (const p of partsDB.blade) result.push({ ...p, _dbType: 'blade', _typeLabel: '刃' });
+  if (partsDB.ratchet) for (const p of partsDB.ratchet) result.push({ ...p, _dbType: 'ratchet', _typeLabel: '固鎖' });
+  if (partsDB.bit) for (const p of partsDB.bit) result.push({ ...p, _dbType: 'bit', _typeLabel: '軸心' });
+  return result;
+}
+
+function getPartSeries(part) {
+  const s = part.series || part.group || '';
+  if (s === 'BX' || s === 'UX' || s === 'CX') return s;
+  return '其他';
+}
+
+// ===== Radar Chart (Canvas 2D) =====
+function drawRadarCanvas(canvas, part, size) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+  ctx.scale(dpr, dpr);
+
+  const cx = size / 2, cy = size / 2;
+  const R = size * 0.38;
+  const r = size * 0.04;
+  const labels = ['攻擊', '防禦', '持久', '加速', '耐久'];
+  const colors = ['#e94560', '#4ecca3', '#5dade2', '#f0a500', '#af7ac5'];
+  const values = [
+    part.attack || 0,
+    part.defense || 0,
+    part.stamina || 0,
+    part.dash || 0,
+    part.burst || 0
+  ];
+  const maxVal = 70;
+  const n = 5;
+  const angleStep = (Math.PI * 2) / n;
+  const startAngle = -Math.PI / 2;
+
+  // Clear
+  ctx.clearRect(0, 0, size, size);
+
+  // Background circles
+  for (let level = 1; level <= 4; ctx.strokeStyle = `rgba(255,255,255,${0.04 + level * 0.02})`, level++) {
+    const lr = R * level / 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, lr, 0, Math.PI * 2);
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Axis lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+    ctx.stroke();
+  }
+
+  // Data polygon fill
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const v = Math.min(values[i] / maxVal, 1);
+    const x = cx + Math.cos(angle) * R * v;
+    const y = cy + Math.sin(angle) * R * v;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = `${colors[0]}22`;
+  ctx.fill();
+
+  // Data polygon stroke
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const v = Math.min(values[i] / maxVal, 1);
+    const x = cx + Math.cos(angle) * R * v;
+    const y = cy + Math.sin(angle) * R * v;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = colors[0];
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Data points
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const v = Math.min(values[i] / maxVal, 1);
+    const x = cx + Math.cos(angle) * R * v;
+    const y = cy + Math.sin(angle) * R * v;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+  }
+
+  // Labels
+  ctx.font = `${Math.max(10, size * 0.055)}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const lx = cx + Math.cos(angle) * (R + size * 0.1);
+    const ly = cy + Math.sin(angle) * (R + size * 0.1);
+    ctx.fillStyle = colors[i];
+    ctx.fillText(labels[i], lx, ly);
+  }
+}
+
+// Draw multi-part radar comparison
+function drawCompareRadar(canvas, parts, size) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+  ctx.scale(dpr, dpr);
+
+  const cx = size / 2, cy = size / 2;
+  const R = size * 0.38;
+  const labels = ['攻擊', '防禦', '持久', '加速', '耐久'];
+  const statKeys = ['attack', 'defense', 'stamina', 'dash', 'burst'];
+  const partColors = ['#e94560', '#4ecca3', '#5dade2', '#f0a500', '#af7ac5', '#ff6b9d', '#00d2ff', '#ffd93d'];
+  const maxVal = 70;
+  const n = 5;
+  const angleStep = (Math.PI * 2) / n;
+  const startAngle = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, size, size);
+
+  // Background
+  for (let level = 1; level <= 4; level++) {
+    const lr = R * level / 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, lr, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,255,255,${0.04 + level * 0.02})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Axis
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+    ctx.stroke();
+  }
+
+  // Labels
+  ctx.font = `bold ${Math.max(10, size * 0.055)}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const labelColors = ['#e94560', '#4ecca3', '#5dade2', '#f0a500', '#af7ac5'];
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const lx = cx + Math.cos(angle) * (R + size * 0.1);
+    const ly = cy + Math.sin(angle) * (R + size * 0.1);
+    ctx.fillStyle = labelColors[i];
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  // Each part
+  for (let pi = 0; pi < parts.length; pi++) {
+    const part = parts[pi];
+    const color = partColors[pi % partColors.length];
+    const values = statKeys.map(k => part[k] || 0);
+
+    // Fill
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = startAngle + i * angleStep;
+      const v = Math.min(values[i] / maxVal, 1);
+      const x = cx + Math.cos(angle) * R * v;
+      const y = cy + Math.sin(angle) * R * v;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color + '18';
+    ctx.fill();
+
+    // Stroke
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = startAngle + i * angleStep;
+      const v = Math.min(values[i] / maxVal, 1);
+      const x = cx + Math.cos(angle) * R * v;
+      const y = cy + Math.sin(angle) * R * v;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+}
+
+// ===== Stats bar HTML =====
+function statBarHtml(label, value, cls, color) {
+  const pct = Math.min((value / 70) * 100, 100);
+  return `<div class="stat-bar-row">
+    <span class="stat-bar-label">${label}</span>
+    <div class="stat-bar-track"><div class="stat-bar-fill ${cls}" style="width:${pct}%;background:${color}"></div></div>
+    <span class="stat-bar-val">${value}</span>
+  </div>`;
+}
+
+// ===== Encyclopedia Tab =====
+function renderEncyclopedia() {
+  const allDB = flatPartsDB();
+  let parts = allDB;
+
+  // Series filter
+  if (encSeriesFilter !== 'all') {
+    parts = parts.filter(p => getPartSeries(p) === encSeriesFilter);
+  }
+
+  // Type filter
+  if (encTypeFilter !== 'all') {
+    parts = parts.filter(p => p._dbType === encTypeFilter);
+  }
+
+  // Search
+  if (encSearch) {
+    const q = encSearch.toLowerCase();
+    parts = parts.filter(p => {
+      const searchable = [p.name, p.code, p.eng, p.jap, ...(p.names || [])].join(' ').toLowerCase();
+      return searchable.includes(q);
+    });
+  }
+
+  // Sort
+  if (encSortBy === 'attack') parts.sort((a, b) => (b.attack || 0) - (a.attack || 0));
+  else if (encSortBy === 'defense') parts.sort((a, b) => (b.defense || 0) - (a.defense || 0));
+  else if (encSortBy === 'stamina') parts.sort((a, b) => (b.stamina || 0) - (a.stamina || 0));
+  else if (encSortBy === 'dash') parts.sort((a, b) => (b.dash || 0) - (a.dash || 0));
+  else if (encSortBy === 'burst') parts.sort((a, b) => (b.burst || 0) - (a.burst || 0));
+  else if (encSortBy === 'name') parts.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+  // Stats
+  document.getElementById('encTotalCount').textContent = allDB.length;
+  document.getElementById('encSelectedCount').textContent = encSelectedIds.size;
+
+  // Compare bar
+  const compareBar = document.getElementById('compareBar');
+  if (encSelectedIds.size >= 2) {
+    compareBar.classList.add('show');
+    document.getElementById('compareCountText').textContent = encSelectedIds.size;
+  } else {
+    compareBar.classList.remove('show');
+  }
+
+  const grid = document.getElementById('encGrid');
+  if (parts.length === 0) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;"><div class="icon">🔍</div><p>找不到零件</p></div>';
+    grid.style.display = 'grid';
+    return;
+  }
+  grid.style.display = 'grid';
+
+  grid.innerHTML = parts.map(p => {
+    const code = escHtml(p.code || '');
+    const name = escHtml(p.name || '');
+    const engName = escHtml(p.eng || '');
+    const series = escHtml(getPartSeries(p));
+    const typeLabel = escHtml(p._typeLabel || '');
+    const isSelected = encSelectedIds.has(p._dbType + ':' + p.code);
+    const cardClass = isSelected ? 'card selected' : 'card';
+
+    return `
+      <div class="${cardClass}" data-dbtype="${escHtml(p._dbType)}" data-code="${code}" data-series="${series}">
+        <div class="card-body">
+          <div class="card-name">${name}</div>
+          ${engName ? `<div class="card-name-sub">${engName}</div>` : ''}
+          <div class="card-cat">${typeLabel} · ${code}</div>
+          <div class="card-series">${series}</div>
+          <div class="stat-bars">
+            ${statBarHtml('攻', p.attack || 0, 'atk-bar', '#e94560')}
+            ${statBarHtml('防', p.defense || 0, 'def-bar', '#4ecca3')}
+            ${statBarHtml('持', p.stamina || 0, 'sta-bar', '#5dade2')}
+            ${statBarHtml('速', p.dash || 0, 'dash-bar', '#f0a500')}
+            ${statBarHtml('爆', p.burst || 0, 'burst-bar', '#af7ac5')}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Card click
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const dbType = card.dataset.dbtype;
+      const code = card.dataset.code;
+      const key = dbType + ':' + code;
+
+      // Check if Ctrl/Cmd held for comparison
+      if (e.ctrlKey || e.metaKey) {
+        if (encSelectedIds.has(key)) {
+          encSelectedIds.delete(key);
+        } else {
+          if (encSelectedIds.size < 8) {
+            encSelectedIds.add(key);
+          } else {
+            showToast('最多比較 8 個零件');
+          }
+        }
+        renderEncyclopedia();
+      } else {
+        // Show detail modal
+        showEncDetail(dbType, code);
+      }
+    });
+  });
+}
+
+function showEncDetail(dbType, code) {
+  const part = partsDB[dbType]?.find(p => p.code === code);
+  if (!part) return;
+
+  const modal = document.getElementById('encDetailModal');
+  const content = document.getElementById('encDetailContent');
+  const series = getPartSeries(part);
+
+  content.innerHTML = `
+    <div class="detail-name">${escHtml(part.name)}</div>
+    ${part.eng ? `<div class="detail-name-en">${escHtml(part.eng)}${part.jap ? ' · ' + escHtml(part.jap) : ''}</div>` : ''}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="detail-cat">${escHtml(part._typeLabel || getCatLabel(dbType))}</span>
+      <span class="detail-series">${escHtml(series)}</span>
+      <span class="detail-series" style="background:var(--card2);color:var(--text2);">${escHtml(part.code)}</span>
+    </div>
+    <div class="radar-container"><canvas id="encRadarCanvas"></canvas></div>
+    <table class="detail-stats">
+      <div class="stat-row"><span class="stat-name">⚔️ 攻擊</span><div class="stat-track"><div class="stat-fill" style="width:${(part.attack||0)/70*100}%;background:#e94560"></div></div><span class="stat-num">${part.attack||0}</span></div>
+      <div class="stat-row"><span class="stat-name">🛡️ 防禦</span><div class="stat-track"><div class="stat-fill" style="width:${(part.defense||0)/70*100}%;background:#4ecca3"></div></div><span class="stat-num">${part.defense||0}</span></div>
+      <div class="stat-row"><span class="stat-name">💨 持久</span><div class="stat-track"><div class="stat-fill" style="width:${(part.stamina||0)/70*100}%;background:#5dade2"></div></div><span class="stat-num">${part.stamina||0}</span></div>
+      <div class="stat-row"><span class="stat-name">⚡ 加速</span><div class="stat-track"><div class="stat-fill" style="width:${(part.dash||0)/70*100}%;background:#f0a500"></div></div><span class="stat-num">${part.dash||0}</span></div>
+      <div class="stat-row"><span class="stat-name">💥 耐久</span><div class="stat-track"><div class="stat-fill" style="width:${(part.burst||0)/70*100}%;background:#af7ac5"></div></div><span class="stat-num">${part.burst||0}</span></div>
+    </table>
+    ${part.desc ? `<div class="detail-note">${escHtml(part.desc)}</div>` : ''}
+  `;
+
+  modal.classList.add('show');
+
+  // Draw radar after modal is visible
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('encRadarCanvas');
+    if (canvas) {
+      const size = Math.min(280, window.innerWidth - 80);
+      drawRadarCanvas(canvas, part, size);
+    }
+  });
+}
+
+// ===== Compare =====
+function showCompare() {
+  const allDB = flatPartsDB();
+  const selected = [];
+  for (const key of encSelectedIds) {
+    const [dbType, code] = key.split(':');
+    const part = partsDB[dbType]?.find(p => p.code === code);
+    if (part) selected.push({ ...part, _dbType: dbType });
+  }
+  if (selected.length < 2) { showToast('請選擇至少 2 個零件'); return; }
+
+  const modal = document.getElementById('compareModal');
+  const content = document.getElementById('compareContent');
+  const statKeys = ['attack', 'defense', 'stamina', 'dash', 'burst'];
+  const statLabels = ['⚔️ 攻擊', '🛡️ 防禦', '💨 持久', '⚡ 加速', '💥 耐久'];
+  const colors = ['#e94560', '#4ecca3', '#5dade2', '#f0a500', '#af7ac5', '#ff6b9d', '#00d2ff', '#ffd93d'];
+
+  let tableHtml = '<div class="compare-table"><table><thead><tr><th>零件</th>';
+  for (const p of selected) {
+    tableHtml += `<th><span class="compare-color-dot" style="background:${colors[selected.indexOf(p) % colors.length]}"></span>${escHtml(p.name.length > 8 ? p.name.slice(0, 8) + '…' : p.name)}</th>`;
+  }
+  tableHtml += '</tr></thead><tbody>';
+  for (let si = 0; si < statKeys.length; si++) {
+    const key = statKeys[si];
+    tableHtml += `<tr><td>${statLabels[si]}</td>`;
+    // Find max for highlighting
+    const maxVal = Math.max(...selected.map(p => p[key] || 0));
+    for (const p of selected) {
+      const val = p[key] || 0;
+      const isMax = val === maxVal && val > 0;
+      tableHtml += `<td style="${isMax ? 'color:' + colors[statKeys.indexOf(key)] + ';font-weight:700;' : ''}">${val}</td>`;
+    }
+    tableHtml += '</tr>';
+  }
+  tableHtml += '</tbody></table></div>';
+
+  // Radar comparison
+  tableHtml += '<div class="radar-container"><canvas id="compareRadarCanvas"></canvas></div>';
+
+  // Legend
+  tableHtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px;">';
+  for (let i = 0; i < selected.length; i++) {
+    const p = selected[i];
+    const c = colors[i % colors.length];
+    tableHtml += `<span style="font-size:12px;display:flex;align-items:center;gap:4px;"><span class="compare-color-dot" style="background:${c}"></span>${escHtml(p.name)}</span>`;
+  }
+  tableHtml += '</div>';
+
+  content.innerHTML = tableHtml;
+  modal.classList.add('show');
+
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('compareRadarCanvas');
+    if (canvas) {
+      const size = Math.min(280, window.innerWidth - 80);
+      drawCompareRadar(canvas, selected, size);
+    }
+  });
+}
+
+// ===== Warehouse Tab =====
+function renderWarehouse() {
   let parts = allParts;
 
-  // Filter by category
-  if (currentFilter !== 'all') {
-    parts = parts.filter(p => p.cat === currentFilter);
+  // Category filter
+  if (whCatFilter !== 'all') {
+    parts = parts.filter(p => p.cat === whCatFilter);
   }
 
-  // Filter by sub-category (code prefix match)
-  if (currentSubFilter) {
-    parts = parts.filter(p => (p.code || '').toUpperCase() === currentSubFilter.toUpperCase());
+  // Sub-filter
+  if (whSubFilter) {
+    parts = parts.filter(p => (p.code || '').toUpperCase() === whSubFilter.toUpperCase());
   }
 
-  // Filter by search (fuzzy: name, code, note)
-  if (currentSearch) {
-    const q = currentSearch.toLowerCase();
+  // Owned filter
+  if (whOwnedFilter === 'yes') parts = parts.filter(p => p.owned);
+  else if (whOwnedFilter === 'no') parts = parts.filter(p => !p.owned);
+
+  // Search
+  if (whSearch) {
+    const q = whSearch.toLowerCase();
     parts = parts.filter(p =>
       (p.name || '').toLowerCase().includes(q) ||
       (p.code || '').toLowerCase().includes(q) ||
@@ -410,17 +1041,21 @@ function render() {
     );
   }
 
-  // Sort by created desc
+  // Sort
   parts.sort((a, b) => (b.created || 0) - (a.created || 0));
 
   // Stats
-  document.getElementById('totalCount').textContent = allParts.length;
-  document.getElementById('bladeCount').textContent = allParts.filter(p => p.cat === 'blade').length;
-  document.getElementById('lockCount').textContent = allParts.filter(p => p.cat === 'lock').length;
-  document.getElementById('driverCount').textContent = allParts.filter(p => p.cat === 'driver').length;
+  document.getElementById('whTotalCount').textContent = allParts.length;
+  document.getElementById('whOwnedCount').textContent = allParts.filter(p => p.owned).length;
+  document.getElementById('whBladeCount').textContent = allParts.filter(p => p.cat === 'blade').length;
+  document.getElementById('whLockCount').textContent = allParts.filter(p => p.cat === 'lock').length;
+  document.getElementById('whDriverCount').textContent = allParts.filter(p => p.cat === 'driver').length;
 
-  // Build sub-filters for lock/driver
-  buildSubFilters();
+  const grid = document.getElementById('whGrid');
+  const empty = document.getElementById('whEmpty');
+
+  // Build sub-filters
+  buildWhSubFilters();
 
   if (parts.length === 0) {
     grid.style.display = 'none';
@@ -436,6 +1071,7 @@ function render() {
       ? `<img src="${p.photo}" alt="${escHtml(p.name)}" loading="lazy">`
       : `<span>${getCatEmoji(p.cat)}</span>`;
     const codeHtml = p.code ? `<div class="db-item-code">${escHtml(p.code)}</div>` : '';
+    const ownedChecked = p.owned ? 'checked' : '';
     return `
       <div class="card" data-id="${p.id}">
         <div class="card-img">${imgHtml}</div>
@@ -444,50 +1080,52 @@ function render() {
           <div class="card-cat">${getCatLabel(p.cat)}</div>
           ${codeHtml}
           ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
+          <label class="owned-check" onclick="event.stopPropagation()">
+            <input type="checkbox" ${ownedChecked} onchange="toggleOwned(${p.id}, this.checked)">
+            擁有
+          </label>
         </div>
       </div>
     `;
   }).join('');
 
-  // Card click
   grid.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => showDetail(parseInt(card.dataset.id)));
+    card.addEventListener('click', () => showWhDetail(parseInt(card.dataset.id)));
   });
 }
 
-// ===== Sub-filters =====
-function buildSubFilters() {
-  const subFilters = document.getElementById('subFilters');
+async function toggleOwned(id, owned) {
+  const part = allParts.find(p => p.id === id);
+  if (!part) return;
+  part.owned = owned;
+  await updatePart(part);
+  renderWarehouse();
+}
+
+function buildWhSubFilters() {
+  const subFilters = document.getElementById('whSubFilters');
   if (!subFilters) return;
 
-  // Only show sub-filters for lock and driver
-  if (currentFilter !== 'lock' && currentFilter !== 'driver') {
+  if (whCatFilter !== 'lock' && whCatFilter !== 'driver') {
     subFilters.style.display = 'none';
-    currentSubFilter = '';
+    whSubFilter = '';
     return;
   }
 
-  // Get all possible codes from partsDB
   let allCodes = [];
-  if (currentFilter === 'lock') {
-    // ratchet codes
+  if (whCatFilter === 'lock') {
     allCodes = (partsDB?.ratchet || []).map(r => r.code).filter(Boolean);
-  } else if (currentFilter === 'driver') {
-    // bit codes
+  } else if (whCatFilter === 'driver') {
     allCodes = (partsDB?.bit || []).map(b => b.code).filter(Boolean);
   }
 
-  // Count how many the user has for each code
-  const catParts = allParts.filter(p => p.cat === currentFilter);
+  const catParts = allParts.filter(p => p.cat === whCatFilter);
   const codeCount = {};
   for (const p of catParts) {
     const code = (p.code || '').toUpperCase();
-    if (code) {
-      codeCount[code] = (codeCount[code] || 0) + 1;
-    }
+    if (code) codeCount[code] = (codeCount[code] || 0) + 1;
   }
 
-  // Sort: codes the user has first, then others
   allCodes = allCodes.sort((a, b) => {
     const hasA = (codeCount[a] || 0) > 0 ? 0 : 1;
     const hasB = (codeCount[b] || 0) > 0 ? 0 : 1;
@@ -497,91 +1135,168 @@ function buildSubFilters() {
 
   if (allCodes.length === 0) {
     subFilters.style.display = 'none';
-    currentSubFilter = '';
+    whSubFilter = '';
     return;
   }
 
   subFilters.style.display = 'flex';
-
-  let html = `<div class="filter-btn${currentSubFilter === '' ? ' active' : ''}" data-sub="">全部</div>`;
+  let html = `<div class="filter-btn${whSubFilter === '' ? ' active' : ''}" data-sub="">全部</div>`;
   for (const code of allCodes) {
     const count = codeCount[code] || 0;
-    const active = currentSubFilter === code ? ' active' : '';
+    const active = whSubFilter === code ? ' active' : '';
     const dimmed = count === 0 ? ' style="opacity:0.45;"' : '';
     html += `<div class="filter-btn${active}" data-sub="${escHtml(code)}"${dimmed}>${escHtml(code)} <span style="opacity:0.6;font-size:11px;">(${count})</span></div>`;
   }
   subFilters.innerHTML = html;
 
-  // Bind click events
   subFilters.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       subFilters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentSubFilter = btn.dataset.sub;
-      render();
+      whSubFilter = btn.dataset.sub;
+      renderWarehouse();
     });
   });
 }
 
-function getCatEmoji(cat) {
-  const map = { blade: '⚔️', lock: '🔒', driver: '⚙️', other: '📦' };
-  return map[cat] || '📦';
+// ===== Warehouse Detail =====
+async function showWhDetail(id) {
+  const part = allParts.find(p => p.id === id);
+  if (!part) return;
+  detailId = id;
+
+  const imgHtml = part.photo
+    ? `<img class="detail-img" src="${part.photo}" alt="${escHtml(part.name)}">`
+    : `<div class="detail-img" style="display:flex;align-items:center;justify-content:center;font-size:80px;background:var(--card2);">${getCatEmoji(part.cat)}</div>`;
+
+  const ownedChecked = part.owned ? 'checked' : '';
+
+  document.getElementById('detailContent').innerHTML = `
+    ${imgHtml}
+    <div class="detail-name">${escHtml(part.name)}</div>
+    <span class="detail-cat">${getCatLabel(part.cat)}</span>
+    ${part.note ? `<div class="detail-note">${escHtml(part.note)}</div>` : ''}
+    <div style="margin-top:12px;">
+      <label class="owned-check" style="font-size:14px;">
+        <input type="checkbox" ${ownedChecked} onchange="toggleOwned(${part.id}, this.checked)">
+        ☑️ 擁有此零件
+      </label>
+    </div>
+    <div class="detail-date">📅 ${new Date(part.created).toLocaleString('zh-TW')}</div>
+  `;
+  document.getElementById('detailModal').classList.add('show');
 }
 
-function getCatLabel(cat) {
-  const map = { blade: '刃 (Blade)', lock: '固鎖 (Lock)', driver: '軸心 (Driver)', other: '其他' };
-  return map[cat] || '其他';
-}
+// ===== Event Listeners =====
 
-function escHtml(s) {
-  const d = document.createElement('d');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-// ===== Search =====
-const searchBtn = document.getElementById('searchBtn');
-searchInput.addEventListener('input', e => {
-  currentSearch = e.target.value.trim();
-  render();
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.getElementById('tab-' + currentTab).classList.add('active');
+    if (currentTab === 'warehouse') renderWarehouse();
+    else renderEncyclopedia();
+  });
 });
-searchBtn.addEventListener('click', () => {
-  currentSearch = searchInput.value.trim();
-  render();
-  searchInput.focus();
+
+// Encyclopedia series filters
+document.getElementById('encSeriesFilters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#encSeriesFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  encSeriesFilter = e.target.dataset.series;
+  renderEncyclopedia();
 });
-searchInput.addEventListener('keydown', e => {
+
+// Encyclopedia type filters
+document.getElementById('encTypeFilters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#encTypeFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  encTypeFilter = e.target.dataset.type;
+  renderEncyclopedia();
+});
+
+// Encyclopedia search
+const encSearchInput = document.getElementById('encSearchInput');
+encSearchInput.addEventListener('input', e => {
+  encSearch = e.target.value.trim();
+  renderEncyclopedia();
+});
+encSearchInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    currentSearch = searchInput.value.trim();
-    render();
+    encSearch = encSearchInput.value.trim();
+    renderEncyclopedia();
+    encSearchInput.blur();
   }
 });
 
-// ===== Filters =====
-filters.addEventListener('click', e => {
-  if (!e.target.classList.contains('filter-btn')) return;
-  filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  currentFilter = e.target.dataset.cat;
-  currentSubFilter = ''; // Reset sub-filter when main category changes
-  render();
+// Encyclopedia sort
+document.getElementById('encSort').addEventListener('change', e => {
+  encSortBy = e.target.value;
+  renderEncyclopedia();
 });
 
-// ===== FAB =====
-fabBtn.addEventListener('click', () => {
+// Compare bar
+document.getElementById('compareClearBtn').addEventListener('click', () => {
+  encSelectedIds.clear();
+  renderEncyclopedia();
+});
+document.getElementById('compareGoBtn').addEventListener('click', () => {
+  showCompare();
+});
+
+// Warehouse category filters
+document.getElementById('whCatFilters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#whCatFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  whCatFilter = e.target.dataset.cat;
+  whSubFilter = '';
+  renderWarehouse();
+});
+
+// Warehouse owned filters
+document.querySelectorAll('.owned-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.owned-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    whOwnedFilter = btn.dataset.owned;
+    renderWarehouse();
+  });
+});
+
+// Warehouse search
+const whSearchInput = document.getElementById('whSearchInput');
+whSearchInput.addEventListener('input', e => {
+  whSearch = e.target.value.trim();
+  renderWarehouse();
+});
+whSearchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    whSearch = whSearchInput.value.trim();
+    renderWarehouse();
+    whSearchInput.blur();
+  }
+});
+
+// FAB
+document.getElementById('fabBtn').addEventListener('click', () => {
   document.getElementById('modalTitle').textContent = '新增零件';
   document.getElementById('editId').value = '';
-  partForm.reset();
-  photoPreview.style.display = 'none';
-  photoPreview.src = '';
-  // Reset cat radio to default (blade)
+  document.getElementById('partForm').reset();
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPreview').src = '';
   document.querySelectorAll('.cat-radio-input').forEach(r => r.checked = false);
   document.querySelector('.cat-radio-input[value="blade"]').checked = true;
   document.getElementById('partCat').value = 'blade';
-  formModal.classList.add('show');
+  document.getElementById('formModal').classList.add('show');
 });
 
-// ===== Cat Radio Buttons (native radio inputs) =====
+// Cat Radio Buttons
 document.querySelectorAll('.cat-radio-input').forEach(input => {
   input.addEventListener('change', () => {
     if (input.checked) {
@@ -590,22 +1305,26 @@ document.querySelectorAll('.cat-radio-input').forEach(input => {
   });
 });
 
-// ===== Modal Close =====
-modalClose.addEventListener('click', () => formModal.classList.remove('show'));
-cancelBtn.addEventListener('click', () => formModal.classList.remove('show'));
-formModal.addEventListener('click', e => { if (e.target === formModal) formModal.classList.remove('show'); });
-// Prevent form clicks from bubbling up to modal overlay (fixes iOS select closing modal)
-partForm.addEventListener('click', e => { e.stopPropagation(); });
+// Modal Close
+document.getElementById('modalClose').addEventListener('click', () => document.getElementById('formModal').classList.remove('show'));
+document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('formModal').classList.remove('show'));
+document.getElementById('formModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+document.getElementById('partForm').addEventListener('click', e => { e.stopPropagation(); });
 
-detailClose.addEventListener('click', () => detailModal.classList.remove('show'));
-detailModal.addEventListener('click', e => { if (e.target === detailModal) detailModal.classList.remove('show'); });
+document.getElementById('detailClose').addEventListener('click', () => document.getElementById('detailModal').classList.remove('show'));
+document.getElementById('detailModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
 
-// ===== Photo =====
-photoArea.addEventListener('click', () => photoInput.click());
-photoInput.addEventListener('change', e => {
+document.getElementById('encDetailClose').addEventListener('click', () => document.getElementById('encDetailModal').classList.remove('show'));
+document.getElementById('encDetailModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+
+document.getElementById('compareClose').addEventListener('click', () => document.getElementById('compareModal').classList.remove('show'));
+document.getElementById('compareModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('show'); });
+
+// Photo
+document.getElementById('photoArea').addEventListener('click', () => document.getElementById('photoInput').click());
+document.getElementById('photoInput').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
-  // Compress image
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
@@ -621,31 +1340,31 @@ photoInput.addEventListener('change', e => {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-      photoPreview.src = dataUrl;
-      photoPreview.style.display = 'block';
+      const preview = document.getElementById('photoPreview');
+      preview.src = dataUrl;
+      preview.style.display = 'block';
     };
     img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 });
 
-// ===== Save =====
-partForm.addEventListener('submit', async e => {
+// Save
+document.getElementById('partForm').addEventListener('submit', async e => {
   e.preventDefault();
   const editId = document.getElementById('editId').value;
   const nameVal = document.getElementById('partName').value.trim();
   const code = document.getElementById('partCode').value.trim();
   const cat = document.getElementById('partCat').value;
   const note = document.getElementById('partNote').value.trim();
-  const photo = photoPreview.style.display !== 'none' ? photoPreview.src : null;
+  const photo = document.getElementById('photoPreview').style.display !== 'none' ? document.getElementById('photoPreview').src : null;
 
   if (!code) { showToast('請輸入代號'); return; }
-  const name = nameVal || code; // 如果名稱空白，用代號代替
+  const name = nameVal || code;
 
   try {
     if (editId) {
-      const parts = await getAllParts();
-      const part = parts.find(p => p.id === parseInt(editId));
+      const part = allParts.find(p => p.id === parseInt(editId));
       if (part) {
         part.name = name;
         part.code = code;
@@ -656,61 +1375,39 @@ partForm.addEventListener('submit', async e => {
         showToast('✅ 已更新');
       }
     } else {
-      await addPart({ name, code, cat, note, photo });
+      await addPart({ name, code, cat, note, photo, owned: true });
       showToast('✅ 已新增');
     }
-    formModal.classList.remove('show');
+    document.getElementById('formModal').classList.remove('show');
     allParts = await getAllParts();
-    render();
+    renderWarehouse();
   } catch (err) {
     showToast('❌ 儲存失敗：' + err.message);
   }
 });
 
-// ===== Detail =====
-async function showDetail(id) {
-  const parts = await getAllParts();
-  const part = parts.find(p => p.id === id);
-  if (!part) return;
-  detailId = id;
-
-  const imgHtml = part.photo
-    ? `<img class="detail-img" src="${part.photo}" alt="${escHtml(part.name)}">`
-    : `<div class="detail-img" style="display:flex;align-items:center;justify-content:center;font-size:80px;background:var(--card2);">${getCatEmoji(part.cat)}</div>`;
-
-  detailContent.innerHTML = `
-    ${imgHtml}
-    <div class="detail-name">${escHtml(part.name)}</div>
-    <span class="detail-cat">${getCatLabel(part.cat)}</span>
-    ${part.note ? `<div class="detail-note">${escHtml(part.note)}</div>` : ''}
-    <div class="detail-date">📅 ${new Date(part.created).toLocaleString('zh-TW')}</div>
-  `;
-  detailModal.classList.add('show');
-}
-
-// ===== Delete =====
-deleteBtn.addEventListener('click', async () => {
+// Delete
+document.getElementById('deleteBtn').addEventListener('click', async () => {
   if (!detailId) return;
   if (!confirm('確定要刪除這個零件嗎？')) return;
   try {
     await deletePart(detailId);
-    detailModal.classList.remove('show');
+    document.getElementById('detailModal').classList.remove('show');
     allParts = await getAllParts();
-    render();
+    renderWarehouse();
     showToast('🗑 已刪除');
   } catch (err) {
     showToast('❌ 刪除失敗');
   }
 });
 
-// ===== Edit =====
-editBtn.addEventListener('click', async () => {
+// Edit
+document.getElementById('editBtn').addEventListener('click', async () => {
   if (!detailId) return;
-  const parts = await getAllParts();
-  const part = parts.find(p => p.id === detailId);
+  const part = allParts.find(p => p.id === detailId);
   if (!part) return;
 
-  detailModal.classList.remove('show');
+  document.getElementById('detailModal').classList.remove('show');
   document.getElementById('modalTitle').textContent = '編輯零件';
   document.getElementById('editId').value = part.id;
   document.getElementById('partName').value = part.name;
@@ -718,27 +1415,25 @@ editBtn.addEventListener('click', async () => {
   document.getElementById('partCat').value = part.cat;
   document.getElementById('partNote').value = part.note || '';
 
-  // Sync cat radio buttons
   document.querySelectorAll('.cat-radio-input').forEach(r => r.checked = false);
   const catRadio = document.querySelector(`.cat-radio-input[value="${part.cat}"]`);
   if (catRadio) catRadio.checked = true;
 
   if (part.photo) {
-    photoPreview.src = part.photo;
-    photoPreview.style.display = 'block';
+    document.getElementById('photoPreview').src = part.photo;
+    document.getElementById('photoPreview').style.display = 'block';
   } else {
-    photoPreview.style.display = 'none';
-    photoPreview.src = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoPreview').src = '';
   }
 
-  formModal.classList.add('show');
+  document.getElementById('formModal').classList.add('show');
 });
 
-// ===== Backup / Restore =====
+// Backup / Restore
 async function doBackup() {
-  const parts = await getAllParts();
-  if (!parts.length) { showToast('沒有資料可備份'); return; }
-  const data = JSON.stringify(parts, null, 2);
+  if (!allParts.length) { showToast('沒有資料可備份'); return; }
+  const data = JSON.stringify(allParts, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -748,7 +1443,7 @@ async function doBackup() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`✅ 已備份 ${parts.length} 筆資料`);
+  showToast(`✅ 已備份 ${allParts.length} 筆資料`);
 }
 
 async function doRestore(file) {
@@ -757,20 +1452,15 @@ async function doRestore(file) {
     const parts = JSON.parse(text);
     if (!Array.isArray(parts) || !parts.length) { showToast('❌ 檔案格式錯誤'); return; }
 
-    // Confirm if existing data
-    const existing = await getAllParts();
-    if (existing.length > 0) {
-      if (!confirm(`目前有 ${existing.length} 筆資料，匯入將覆蓋全部 ${parts.length} 筆資料。確定繼續？`)) return;
-      // Clear existing
-      const db = await openDB();
+    if (allParts.length > 0) {
+      if (!confirm(`目前有 ${allParts.length} 筆資料，匯入將覆蓋全部 ${parts.length} 筆資料。確定繼續？`)) return;
       const tx = db.transaction(STORE_NAME, 'readwrite');
       tx.objectStore(STORE_NAME).clear();
+      await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
     }
 
-    // Import in batches of 50
     for (let i = 0; i < parts.length; i += 50) {
       const batch = parts.slice(i, i + 50);
-      const db = await openDB();
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
       for (const part of batch) {
@@ -782,9 +1472,9 @@ async function doRestore(file) {
 
     allParts = await getAllParts();
     showToast(`✅ 已匯入 ${parts.length} 筆資料`);
-    // Close any open modals
-    formModal.classList.remove('show');
-    detailModal.classList.remove('show');
+    document.getElementById('formModal').classList.remove('show');
+    document.getElementById('detailModal').classList.remove('show');
+    renderWarehouse();
   } catch (err) {
     console.error(err);
     showToast('❌ 匯入失敗：' + (err.message || '檔案格式錯誤'));
@@ -797,38 +1487,31 @@ document.getElementById('restoreInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     doRestore(file);
-    e.target.value = ''; // Reset so same file can be selected again
+    e.target.value = '';
   }
 });
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
 
-// ===== PWA Install =====
+// PWA Install
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  // Only show if not standalone
   if (!window.matchMedia('(display-mode: standalone)').matches) {
-    installBanner.classList.add('show');
+    document.getElementById('installBanner').classList.add('show');
   }
 });
 
-installBtn.addEventListener('click', async () => {
+document.getElementById('installBtn').addEventListener('click', async () => {
   if (!deferredPrompt) {
-    // iOS Safari doesn't support beforeinstallprompt
     showToast('📲 用 Safari 開啟 → 分享 → 加入主畫面');
     return;
   }
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') installBanner.classList.remove('show');
+  if (outcome === 'accepted') document.getElementById('installBanner').classList.remove('show');
   deferredPrompt = null;
 });
 
-closeBanner.addEventListener('click', () => installBanner.classList.remove('show'));
+document.getElementById('closeBanner').addEventListener('click', () => document.getElementById('installBanner').classList.remove('show'));
 
 // iOS Safari hint
 if (window.navigator.standalone !== true && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
@@ -837,151 +1520,13 @@ if (window.navigator.standalone !== true && /iPhone|iPad|iPod/.test(navigator.us
   }, 3000);
 }
 
-// ===== No Service Worker =====
-// SW removed to avoid iOS standalone mode routing issues
-// Data is stored in IndexedDB which works fine offline
-
 // ===== Init =====
 (async () => {
   await openDB();
   allParts = await getAllParts();
-  render();
-})();
-
-// ===== Parts Database (from go-shoot.github.io/x) =====
-let partsDB = null;
-let dbCat = 'all';
-
-async function loadPartsDB() {
-  if (partsDB) return partsDB;
-  try {
-    const resp = await fetch('parts.json');
-    partsDB = await resp.json();
-    return partsDB;
-  } catch(e) {
-    console.error('Failed to load parts DB:', e);
-    return null;
-  }
-}
-
-function searchPartsDB(query, cat) {
-  if (!partsDB) return [];
-  const q = query.toLowerCase().trim();
-  const results = [];
-  const cats = cat === 'all' ? ['blade', 'ratchet', 'bit'] : [cat];
-  const catLabels = { blade: '刃', ratchet: '固鎖', bit: '軸心' };
-
-  for (const c of cats) {
-    const parts = partsDB[c] || [];
-    for (const p of parts) {
-      if (!q) {
-        results.push({ ...p, cat: c, catLabel: catLabels[c] });
-        continue;
-      }
-      const searchable = [
-        p.name,
-        p.code,
-        p.eng,
-        p.jap,
-        ...(p.names || [])
-      ].join(' ').toLowerCase();
-      if (searchable.includes(q)) {
-        results.push({ ...p, cat: c, catLabel: catLabels[c] });
-      }
-    }
-  }
-  return results;
-}
-
-function renderDBResults(results) {
-  const container = document.getElementById('dbResults');
-  if (!container) return;
-  if (results.length === 0) {
-    container.innerHTML = '<div class="db-empty">找不到零件</div>';
-    return;
-  }
-  container.innerHTML = results.map(p => `
-    <div class="db-item" data-code="${p.code}" data-cat="${p.cat}">
-      <div>
-        <div class="db-item-name">${escHtml(p.name)}</div>
-        <div class="db-item-code">${escHtml(p.code)} · ${escHtml(p.catLabel)}</div>
-      </div>
-      <button class="db-item-add" onclick="addFromDB('${p.code}', '${p.cat}')">+ 加入</button>
-    </div>
-  `).join('');
-}
-
-async function addFromDB(code, cat) {
-  const part = partsDB[cat]?.find(p => p.code === code);
-  if (!part) return;
-  const name = part.name || part.eng || code;
-  const catMap = { blade: 'blade', ratchet: 'lock', bit: 'driver' };
-  const partCode = part.code || '';
-  await addPart({ name, code: partCode, cat: catMap[cat] || 'other', note: '', photo: null });
-  allParts = await getAllParts();
-  render();
-  showToast('✅ 已加入：' + name);
-}
-
-// Initialize DB search
-(async () => {
   await loadPartsDB();
-  // Add DB search section after header
-  const header = document.querySelector('.header');
-  if (header && !document.getElementById('dbSearchSection')) {
-    const dbSection = document.createElement('div');
-    dbSection.id = 'dbSearchSection';
-    dbSection.className = 'db-search';
-    dbSection.style.display = 'none';
-    dbSection.innerHTML = `
-      <input type="text" class="db-search-input" id="dbSearchInput" placeholder="🔍 搜尋零件百科（190+ 零件）...">
-      <div class="db-cat-tabs">
-        <div class="db-cat-tab active" data-dbcat="all">全部</div>
-        <div class="db-cat-tab" data-dbcat="blade">刃</div>
-        <div class="db-cat-tab" data-dbcat="ratchet">固鎖</div>
-        <div class="db-cat-tab" data-dbcat="bit">軸心</div>
-      </div>
-      <div class="db-results" id="dbResults"></div>
-    `;
-    header.parentNode.insertBefore(dbSection, header.nextSibling);
-
-    // Toggle DB search with a button in header
-    const toggleBtn = document.createElement('button');
-    toggleBtn.id = 'dbToggleBtn';
-    toggleBtn.style.cssText = 'position:fixed;bottom:24px;left:24px;width:56px;height:56px;border-radius:50%;background:var(--accent2);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(15,52,96,0.4);cursor:pointer;z-index:200;border:none;';
-    toggleBtn.textContent = '📖';
-    toggleBtn.title = '零件百科';
-    document.body.appendChild(toggleBtn);
-
-    let dbVisible = false;
-    toggleBtn.addEventListener('click', () => {
-      dbVisible = !dbVisible;
-      dbSection.style.display = dbVisible ? 'block' : 'none';
-      if (dbVisible) {
-        document.getElementById('dbSearchInput').focus();
-        // Show all parts initially
-        const results = searchPartsDB('', dbCat);
-        renderDBResults(results.slice(0, 50));
-      }
-    });
-
-    // DB search input
-    document.getElementById('dbSearchInput').addEventListener('input', e => {
-      const results = searchPartsDB(e.target.value, dbCat);
-      renderDBResults(results.slice(0, 50));
-    });
-
-    // DB cat tabs
-    document.querySelectorAll('.db-cat-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.db-cat-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        dbCat = tab.dataset.dbcat;
-        const results = searchPartsDB(document.getElementById('dbSearchInput').value, dbCat);
-        renderDBResults(results.slice(0, 50));
-      });
-    });
-  }
+  renderEncyclopedia();
+  renderWarehouse();
 })();
 </script>
 </body>
