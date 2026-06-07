@@ -56,7 +56,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .db-empty { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
 .search-box .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.5; }
 
-/* Category Filter */
+/* Category Radio Buttons */
+.cat-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.cat-radio { padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.cat-radio.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.cat-radio:active { opacity: 0.7; }
 .filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
 .filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
@@ -209,7 +213,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
       <div class="form-group">
         <label>📂 分類</label>
-        <select id="partCat">
+        <div class="cat-radio-group" id="catRadioGroup">
+          <div class="cat-radio active" data-value="blade">刃 (Blade)</div>
+          <div class="cat-radio" data-value="lock">固鎖 (Lock)</div>
+          <div class="cat-radio" data-value="driver">軸心 (Driver)</div>
+          <div class="cat-radio" data-value="other">其他</div>
+        </div>
+        <select id="partCat" style="display:none">
           <option value="blade">刃 (Blade)</option>
           <option value="lock">固鎖 (Lock)</option>
           <option value="driver">軸心 (Driver)</option>
@@ -537,7 +547,20 @@ fabBtn.addEventListener('click', () => {
   partForm.reset();
   photoPreview.style.display = 'none';
   photoPreview.src = '';
+  // Reset cat radio to default (blade)
+  document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
+  document.querySelector('.cat-radio[data-value="blade"]').classList.add('active');
+  document.getElementById('partCat').value = 'blade';
   formModal.classList.add('show');
+});
+
+// ===== Cat Radio Buttons =====
+document.querySelectorAll('.cat-radio').forEach(radio => {
+  radio.addEventListener('click', () => {
+    document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
+    radio.classList.add('active');
+    document.getElementById('partCat').value = radio.dataset.value;
+  });
 });
 
 // ===== Modal Close =====
@@ -666,6 +689,11 @@ editBtn.addEventListener('click', async () => {
   document.getElementById('partCode').value = part.code || '';
   document.getElementById('partCat').value = part.cat;
   document.getElementById('partNote').value = part.note || '';
+
+  // Sync cat radio
+  document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
+  const catRadio = document.querySelector(`.cat-radio[data-value="${part.cat}"]`);
+  if (catRadio) catRadio.classList.add('active');
 
   if (part.photo) {
     photoPreview.src = part.photo;
