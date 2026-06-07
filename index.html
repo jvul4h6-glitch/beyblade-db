@@ -204,12 +204,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
       <div class="form-group">
-        <label>🏷️ 零件名稱 *</label>
-        <input type="text" id="partName" placeholder="例如：CX-04 英仙幽冥" required>
+        <label>🔢 代號 *</label>
+        <input type="text" id="partCode" placeholder="例如：CX-04、3-80、J" required>
       </div>
       <div class="form-group">
-        <label>🔢 代號</label>
-        <input type="text" id="partCode" placeholder="例如：CX-04、3-80、J">
+        <label>🏷️ 零件名稱</label>
+        <input type="text" id="partName" placeholder="例如：翔空、九尾、Point">
       </div>
       <div class="form-group">
         <label>📂 分類</label>
@@ -606,13 +606,14 @@ photoInput.addEventListener('change', e => {
 partForm.addEventListener('submit', async e => {
   e.preventDefault();
   const editId = document.getElementById('editId').value;
-  const name = document.getElementById('partName').value.trim();
+  const nameVal = document.getElementById('partName').value.trim();
   const code = document.getElementById('partCode').value.trim();
   const cat = document.getElementById('partCat').value;
   const note = document.getElementById('partNote').value.trim();
   const photo = photoPreview.style.display !== 'none' ? photoPreview.src : null;
 
-  if (!name) { showToast('請輸入零件名稱'); return; }
+  if (!code) { showToast('請輸入代號'); return; }
+  const name = nameVal || code; // 如果名稱空白，用代號代替
 
   try {
     if (editId) {
