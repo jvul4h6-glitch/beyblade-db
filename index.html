@@ -140,7 +140,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <h1><span>🌀</span> 陀螺零件庫</h1>
   <div class="search-box">
     <span class="search-icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="搜尋零件名稱...">
+    <input type="text" id="searchInput" placeholder="搜尋零件名稱、代號、備註...">
   </div>
   <div class="filters" id="filters">
     <div class="filter-btn active" data-cat="all">全部</div>
@@ -148,6 +148,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="filter-btn" data-cat="lock">固鎖 (Lock)</div>
     <div class="filter-btn" data-cat="driver">軸心 (Driver)</div>
     <div class="filter-btn" data-cat="other">其他</div>
+  </div>
+  <!-- Sub-filters for lock/driver (populated dynamically when category selected) -->
+  <div class="filters" id="subFilters" style="margin-top:8px;display:none;">
   </div>
   <div class="stats">
     <div class="stat"><div class="num" id="totalCount">0</div><div class="label">總零件</div></div>
@@ -190,6 +193,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="form-group">
         <label>🏷️ 零件名稱 *</label>
         <input type="text" id="partName" placeholder="例如：CX-04 英仙幽冥" required>
+      </div>
+      <div class="form-group">
+        <label>🔢 代號</label>
+        <input type="text" id="partCode" placeholder="例如：CX-04、3-80、J">
       </div>
       <div class="form-group">
         <label>📂 分類</label>
@@ -305,6 +312,7 @@ function deletePart(id) {
 // ===== State =====
 let allParts = [];
 let currentFilter = 'all';
+let currentSubFilter = ''; // e.g. '3-80' for lock, 'J' for driver
 let currentSearch = '';
 let detailId = null;
 let deferredPrompt = null;
@@ -341,11 +349,17 @@ function render() {
     parts = parts.filter(p => p.cat === currentFilter);
   }
 
-  // Filter by search
+  // Filter by sub-category (code prefix match)
+  if (currentSubFilter) {
+    parts = parts.filter(p => (p.code || '').toUpperCase() === currentSubFilter.toUpperCase());
+  }
+
+  // Filter by search (fuzzy: name, code, note)
   if (currentSearch) {
     const q = currentSearch.toLowerCase();
     parts = parts.filter(p =>
       (p.name || '').toLowerCase().includes(q) ||
+      (p.code || '').toLowerCase().includes(q) ||
       (p.note || '').toLowerCase().includes(q)
     );
   }
@@ -358,6 +372,9 @@ function render() {
   document.getElementById('bladeCount').textContent = allParts.filter(p => p.cat === 'blade').length;
   document.getElementById('lockCount').textContent = allParts.filter(p => p.cat === 'lock').length;
   document.getElementById('driverCount').textContent = allParts.filter(p => p.cat === 'driver').length;
+
+  // Build sub-filters for lock/driver
+  buildSubFilters();
 
   if (parts.length === 0) {
     grid.style.display = 'none';
@@ -372,12 +389,14 @@ function render() {
     const imgHtml = p.photo
       ? `<img src="${p.photo}" alt="${escHtml(p.name)}" loading="lazy">`
       : `<span>${getCatEmoji(p.cat)}</span>`;
+    const codeHtml = p.code ? `<div class="db-item-code">${escHtml(p.code)}</div>` : '';
     return `
       <div class="card" data-id="${p.id}">
         <div class="card-img">${imgHtml}</div>
         <div class="card-body">
           <div class="card-name">${escHtml(p.name)}</div>
           <div class="card-cat">${getCatLabel(p.cat)}</div>
+          ${codeHtml}
           ${p.note ? `<div class="card-note">${escHtml(p.note)}</div>` : ''}
         </div>
       </div>
@@ -387,6 +406,55 @@ function render() {
   // Card click
   grid.querySelectorAll('.card').forEach(card => {
     card.addEventListener('click', () => showDetail(parseInt(card.dataset.id)));
+  });
+}
+
+// ===== Sub-filters =====
+function buildSubFilters() {
+  const subFilters = document.getElementById('subFilters');
+  if (!subFilters) return;
+
+  // Only show sub-filters for lock and driver
+  if (currentFilter !== 'lock' && currentFilter !== 'driver') {
+    subFilters.style.display = 'none';
+    currentSubFilter = '';
+    return;
+  }
+
+  // Collect unique codes from parts in this category
+  const catParts = allParts.filter(p => p.cat === currentFilter);
+  const codeCount = {};
+  for (const p of catParts) {
+    const code = (p.code || '').toUpperCase();
+    if (code) {
+      codeCount[code] = (codeCount[code] || 0) + 1;
+    }
+  }
+
+  const codes = Object.keys(codeCount).sort();
+  if (codes.length === 0) {
+    subFilters.style.display = 'none';
+    currentSubFilter = '';
+    return;
+  }
+
+  subFilters.style.display = 'flex';
+
+  let html = `<div class="filter-btn${currentSubFilter === '' ? ' active' : ''}" data-sub="">全部</div>`;
+  for (const code of codes) {
+    const active = currentSubFilter === code ? ' active' : '';
+    html += `<div class="filter-btn${active}" data-sub="${escHtml(code)}">${escHtml(code)} <span style="opacity:0.6;font-size:11px;">(${codeCount[code]})</span></div>`;
+  }
+  subFilters.innerHTML = html;
+
+  // Bind click events
+  subFilters.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      subFilters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSubFilter = btn.dataset.sub;
+      render();
+    });
   });
 }
 
@@ -418,6 +486,7 @@ filters.addEventListener('click', e => {
   filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   currentFilter = e.target.dataset.cat;
+  currentSubFilter = ''; // Reset sub-filter when main category changes
   render();
 });
 
@@ -473,6 +542,7 @@ partForm.addEventListener('submit', async e => {
   e.preventDefault();
   const editId = document.getElementById('editId').value;
   const name = document.getElementById('partName').value.trim();
+  const code = document.getElementById('partCode').value.trim();
   const cat = document.getElementById('partCat').value;
   const note = document.getElementById('partNote').value.trim();
   const photo = photoPreview.style.display !== 'none' ? photoPreview.src : null;
@@ -485,6 +555,7 @@ partForm.addEventListener('submit', async e => {
       const part = parts.find(p => p.id === parseInt(editId));
       if (part) {
         part.name = name;
+        part.code = code;
         part.cat = cat;
         part.note = note;
         if (photo) part.photo = photo;
@@ -492,7 +563,7 @@ partForm.addEventListener('submit', async e => {
         showToast('✅ 已更新');
       }
     } else {
-      await addPart({ name, cat, note, photo });
+      await addPart({ name, code, cat, note, photo });
       showToast('✅ 已新增');
     }
     formModal.classList.remove('show');
@@ -550,6 +621,7 @@ editBtn.addEventListener('click', async () => {
   document.getElementById('modalTitle').textContent = '編輯零件';
   document.getElementById('editId').value = part.id;
   document.getElementById('partName').value = part.name;
+  document.getElementById('partCode').value = part.code || '';
   document.getElementById('partCat').value = part.cat;
   document.getElementById('partNote').value = part.note || '';
 
@@ -681,7 +753,8 @@ async function addFromDB(code, cat) {
   if (!part) return;
   const name = part.name || part.eng || code;
   const catMap = { blade: 'blade', ratchet: 'lock', bit: 'driver' };
-  await addPart({ name, cat: catMap[cat] || 'other', note: `代號: ${code}`, photo: null });
+  const partCode = part.code || '';
+  await addPart({ name, code: partCode, cat: catMap[cat] || 'other', note: '', photo: null });
   allParts = await getAllParts();
   render();
   showToast('✅ 已加入：' + name);
