@@ -544,6 +544,8 @@ fabBtn.addEventListener('click', () => {
 modalClose.addEventListener('click', () => formModal.classList.remove('show'));
 cancelBtn.addEventListener('click', () => formModal.classList.remove('show'));
 formModal.addEventListener('click', e => { if (e.target === formModal) formModal.classList.remove('show'); });
+// Prevent form clicks from bubbling up to modal overlay (fixes iOS select closing modal)
+partForm.addEventListener('click', e => { e.stopPropagation(); });
 
 detailClose.addEventListener('click', () => detailModal.classList.remove('show'));
 detailModal.addEventListener('click', e => { if (e.target === detailModal) detailModal.classList.remove('show'); });
