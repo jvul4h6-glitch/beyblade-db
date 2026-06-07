@@ -146,6 +146,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .install-banner button { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .install-banner .close-banner { background: none; color: var(--text2); font-size: 18px; padding: 4px 8px; }
 
+/* Logo */
+.logo { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 6px; }
+
 /* Backup Bar */
 .backup-bar { display: flex; gap: 8px; padding: 8px 16px 0; justify-content: flex-end; }
 .backup-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.2s; }
@@ -156,7 +159,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <!-- Header -->
 <div class="header">
-  <h1><span>🌀</span> 陀螺零件庫</h1>
+  <h1><img class="logo" src="logo.jpg" alt="logo"> 陀螺零件庫</h1>
   <div class="search-box">
     <span class="search-icon">🔍</span>
     <input type="text" id="searchInput" placeholder="搜尋零件名稱、代號、備註...">
