@@ -145,6 +145,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .install-banner.show { display: flex; }
 .install-banner button { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .install-banner .close-banner { background: none; color: var(--text2); font-size: 18px; padding: 4px 8px; }
+
+/* Backup Bar */
+.backup-bar { display: flex; gap: 8px; padding: 8px 16px 0; justify-content: flex-end; }
+.backup-btn { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.backup-btn:active { opacity: 0.6; }
 </style>
 </head>
 <body>
@@ -172,6 +177,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="stat"><div class="num" id="bladeCount">0</div><div class="label">刃</div></div>
     <div class="stat"><div class="num" id="lockCount">0</div><div class="label">固鎖</div></div>
     <div class="stat"><div class="num" id="driverCount">0</div><div class="label">軸心</div></div>
+  </div>
+  <div class="backup-bar">
+    <button class="backup-btn" id="backupBtn" title="備份資料">📥 備份</button>
+    <button class="backup-btn" id="restoreBtn" title="匯入資料">📤 匯入</button>
+    <input type="file" id="restoreInput" accept=".json" style="display:none">
   </div>
 </div>
 
@@ -721,7 +731,72 @@ editBtn.addEventListener('click', async () => {
   formModal.classList.add('show');
 });
 
-// ===== Toast =====
+// ===== Backup / Restore =====
+async function doBackup() {
+  const parts = await getAllParts();
+  if (!parts.length) { showToast('沒有資料可備份'); return; }
+  const data = JSON.stringify(parts, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `beyblade-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`✅ 已備份 ${parts.length} 筆資料`);
+}
+
+async function doRestore(file) {
+  try {
+    const text = await file.text();
+    const parts = JSON.parse(text);
+    if (!Array.isArray(parts) || !parts.length) { showToast('❌ 檔案格式錯誤'); return; }
+
+    // Confirm if existing data
+    const existing = await getAllParts();
+    if (existing.length > 0) {
+      if (!confirm(`目前有 ${existing.length} 筆資料，匯入將覆蓋全部 ${parts.length} 筆資料。確定繼續？`)) return;
+      // Clear existing
+      const db = await openDB();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).clear();
+    }
+
+    // Import in batches of 50
+    for (let i = 0; i < parts.length; i += 50) {
+      const batch = parts.slice(i, i + 50);
+      const db = await openDB();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      for (const part of batch) {
+        const { id, ...rest } = part;
+        store.add(rest);
+      }
+      await new Promise((res, rej) => { tx.oncomplete = res; tx.onerror = rej; });
+    }
+
+    allParts = await getAllParts();
+    showToast(`✅ 已匯入 ${parts.length} 筆資料`);
+    // Close any open modals
+    formModal.classList.remove('show');
+    detailModal.classList.remove('show');
+  } catch (err) {
+    console.error(err);
+    showToast('❌ 匯入失敗：' + (err.message || '檔案格式錯誤'));
+  }
+}
+
+document.getElementById('backupBtn').addEventListener('click', doBackup);
+document.getElementById('restoreBtn').addEventListener('click', () => document.getElementById('restoreInput').click());
+document.getElementById('restoreInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    doRestore(file);
+    e.target.value = ''; // Reset so same file can be selected again
+  }
+});
 function showToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
