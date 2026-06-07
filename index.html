@@ -430,7 +430,17 @@ function buildSubFilters() {
     return;
   }
 
-  // Collect unique codes from parts in this category
+  // Get all possible codes from partsDB
+  let allCodes = [];
+  if (currentFilter === 'lock') {
+    // ratchet codes
+    allCodes = (partsDB?.ratchet || []).map(r => r.code).filter(Boolean);
+  } else if (currentFilter === 'driver') {
+    // bit codes
+    allCodes = (partsDB?.bit || []).map(b => b.code).filter(Boolean);
+  }
+
+  // Count how many the user has for each code
   const catParts = allParts.filter(p => p.cat === currentFilter);
   const codeCount = {};
   for (const p of catParts) {
@@ -440,8 +450,15 @@ function buildSubFilters() {
     }
   }
 
-  const codes = Object.keys(codeCount).sort();
-  if (codes.length === 0) {
+  // Sort: codes the user has first, then others
+  allCodes = allCodes.sort((a, b) => {
+    const hasA = (codeCount[a] || 0) > 0 ? 0 : 1;
+    const hasB = (codeCount[b] || 0) > 0 ? 0 : 1;
+    if (hasA !== hasB) return hasA - hasB;
+    return a.localeCompare(b);
+  });
+
+  if (allCodes.length === 0) {
     subFilters.style.display = 'none';
     currentSubFilter = '';
     return;
@@ -450,9 +467,11 @@ function buildSubFilters() {
   subFilters.style.display = 'flex';
 
   let html = `<div class="filter-btn${currentSubFilter === '' ? ' active' : ''}" data-sub="">全部</div>`;
-  for (const code of codes) {
+  for (const code of allCodes) {
+    const count = codeCount[code] || 0;
     const active = currentSubFilter === code ? ' active' : '';
-    html += `<div class="filter-btn${active}" data-sub="${escHtml(code)}">${escHtml(code)} <span style="opacity:0.6;font-size:11px;">(${codeCount[code]})</span></div>`;
+    const dimmed = count === 0 ? ' style="opacity:0.45;"' : '';
+    html += `<div class="filter-btn${active}" data-sub="${escHtml(code)}"${dimmed}>${escHtml(code)} <span style="opacity:0.6;font-size:11px;">(${count})</span></div>`;
   }
   subFilters.innerHTML = html;
 
