@@ -58,9 +58,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* Category Radio Buttons */
 .cat-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
-.cat-radio { padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.2s; }
-.cat-radio.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.cat-radio:active { opacity: 0.7; }
+.cat-radio-label { cursor: pointer; }
+.cat-radio-input { display: none; }
+.cat-radio-span { display: inline-block; padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; transition: all 0.2s; }
+.cat-radio-input:checked + .cat-radio-span { background: var(--accent); color: #fff; border-color: var(--accent); }
+.cat-radio-label:active .cat-radio-span { opacity: 0.7; }
 .filters { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .filters::-webkit-scrollbar { display: none; }
 .filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); color: var(--text2); font-size: 13px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
@@ -214,10 +216,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="form-group">
         <label>📂 分類</label>
         <div class="cat-radio-group" id="catRadioGroup">
-          <div class="cat-radio active" data-value="blade">刃 (Blade)</div>
-          <div class="cat-radio" data-value="lock">固鎖 (Lock)</div>
-          <div class="cat-radio" data-value="driver">軸心 (Driver)</div>
-          <div class="cat-radio" data-value="other">其他</div>
+          <label class="cat-radio-label">
+            <input type="radio" name="catRadio" value="blade" class="cat-radio-input" checked>
+            <span class="cat-radio-span">刃 (Blade)</span>
+          </label>
+          <label class="cat-radio-label">
+            <input type="radio" name="catRadio" value="lock" class="cat-radio-input">
+            <span class="cat-radio-span">固鎖 (Lock)</span>
+          </label>
+          <label class="cat-radio-label">
+            <input type="radio" name="catRadio" value="driver" class="cat-radio-input">
+            <span class="cat-radio-span">軸心 (Driver)</span>
+          </label>
+          <label class="cat-radio-label">
+            <input type="radio" name="catRadio" value="other" class="cat-radio-input">
+            <span class="cat-radio-span">其他</span>
+          </label>
         </div>
         <select id="partCat" style="display:none">
           <option value="blade">刃 (Blade)</option>
@@ -548,18 +562,18 @@ fabBtn.addEventListener('click', () => {
   photoPreview.style.display = 'none';
   photoPreview.src = '';
   // Reset cat radio to default (blade)
-  document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
-  document.querySelector('.cat-radio[data-value="blade"]').classList.add('active');
+  document.querySelectorAll('.cat-radio-input').forEach(r => r.checked = false);
+  document.querySelector('.cat-radio-input[value="blade"]').checked = true;
   document.getElementById('partCat').value = 'blade';
   formModal.classList.add('show');
 });
 
-// ===== Cat Radio Buttons =====
-document.querySelectorAll('.cat-radio').forEach(radio => {
-  radio.addEventListener('click', () => {
-    document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
-    radio.classList.add('active');
-    document.getElementById('partCat').value = radio.dataset.value;
+// ===== Cat Radio Buttons (native radio inputs) =====
+document.querySelectorAll('.cat-radio-input').forEach(input => {
+  input.addEventListener('change', () => {
+    if (input.checked) {
+      document.getElementById('partCat').value = input.value;
+    }
   });
 });
 
@@ -691,10 +705,10 @@ editBtn.addEventListener('click', async () => {
   document.getElementById('partCat').value = part.cat;
   document.getElementById('partNote').value = part.note || '';
 
-  // Sync cat radio
-  document.querySelectorAll('.cat-radio').forEach(r => r.classList.remove('active'));
-  const catRadio = document.querySelector(`.cat-radio[data-value="${part.cat}"]`);
-  if (catRadio) catRadio.classList.add('active');
+  // Sync cat radio buttons
+  document.querySelectorAll('.cat-radio-input').forEach(r => r.checked = false);
+  const catRadio = document.querySelector(`.cat-radio-input[value="${part.cat}"]`);
+  if (catRadio) catRadio.checked = true;
 
   if (part.photo) {
     photoPreview.src = part.photo;
